@@ -1,0 +1,67 @@
+2026-04-15 14:23:11 INFO  database-client Initializing database connection: DRIVER={ODBC Driver 17 for SQL Server};SERVER=shopsphere-prod.database.windows.net;DATABASE=ShopSphere;UID=dbadmin;PWD=P@ssw0rd123!
+2026-04-15 14:23:12 INFO  database-client Database connection established
+2026-04-15 14:23:15 INFO  checkout-service Processing checkout for customer_id=1001 amount=299.99
+2026-04-15 14:23:15 INFO  database-client Fetching discount for customer 1001
+2026-04-15 14:23:16 ERROR database-client Failed to get customer discount
+2026-04-15 14:23:16 ERROR checkout-service Checkout failed for customer_id=1001
+2026-04-15 14:23:18 INFO  checkout-service Processing checkout for customer_id=1002 amount=150.00
+2026-04-15 14:23:18 INFO  database-client Fetching discount for customer 1002
+2026-04-15 14:23:18 INFO  database-client Order created: OrderId=5001
+2026-04-15 14:23:19 INFO  payment-client Processing payment for order 5001 amount=135.00
+2026-04-15 14:23:19 INFO  database-client Logging payment attempt for order 5001
+2026-04-15 14:23:19 WARN  database-client Payment logged but commit not called
+2026-04-15 14:23:22 INFO  checkout-service Processing checkout for customer_id=1003 amount=500.00
+2026-04-15 14:23:22 INFO  database-client Fetching discount for customer 1003
+2026-04-15 14:23:22 ERROR database-client Failed to get customer discount
+2026-04-15 14:23:22 ERROR checkout-service TypeError: unsupported operand type(s) for -: 'float' and 'NoneType'
+2026-04-15 14:23:25 INFO  admin-api Searching orders for customer: alice@example.com
+2026-04-15 14:23:25 INFO  database-client Executing order search query
+2026-04-15 14:23:28 WARN  database-client Query execution time: 3847ms (SLOW - missing index detected)
+2026-04-15 14:23:28 INFO  admin-api Returned 247 orders for customer
+2026-04-15 14:23:30 ERROR security-monitor SQL query execution time exceeds threshold: 3847ms
+2026-04-15 14:23:30 WARN  security-monitor Potential performance issue or attack detected
+2026-04-15 14:23:35 INFO  checkout-service Processing checkout for customer_id=1004 amount=89.99
+2026-04-15 14:23:35 INFO  database-client Fetching discount for customer 1004
+2026-04-15 14:23:35 INFO  database-client Order created: OrderId=5002
+2026-04-15 14:23:36 INFO  payment-client Processing payment for order 5002 amount=76.49
+2026-04-15 14:23:36 INFO  database-client Logging payment attempt for order 5002
+2026-04-15 14:23:36 ERROR payment-client Payment gateway timeout after 1000ms
+2026-04-15 14:23:36 INFO  database-client Failed to log payment attempt
+2026-04-15 14:23:40 ERROR monitoring Detected orphaned order: OrderId=4950 CustomerId=999 (customer not found)
+2026-04-15 14:23:40 WARN  monitoring Data integrity violation: Orders table contains 15 orphaned records
+2026-04-15 14:23:42 INFO  loyalty-service Calculating points for order 5001 amount=135.00 tier=Gold
+2026-04-15 14:23:42 ERROR loyalty-service Logic error: Gold customer received 600 points instead of expected 405
+2026-04-15 14:23:42 WARN  loyalty-service fn_CalculateLoyaltyPoints returning incorrect values
+2026-04-15 14:23:45 INFO  admin-api Searching orders for customer: ' OR '1'='1
+2026-04-15 14:23:45 CRITICAL database-client SQL INJECTION ATTEMPT DETECTED
+2026-04-15 14:23:45 ERROR database-client Executing vulnerable query: SELECT o.OrderId... WHERE c.Email = '' OR '1'='1'
+2026-04-15 14:23:46 CRITICAL security-monitor SECURITY BREACH: SQL injection returned all 8,524 orders in database
+2026-04-15 14:23:46 ERROR security-monitor PagerDuty alert fired: INC-20260415-1445 (P0 - Security Incident)
+2026-04-15 14:23:48 INFO  checkout-service Processing checkout for customer_id=1005 amount=1200.00
+2026-04-15 14:23:48 INFO  database-client Fetching discount for customer 1005
+2026-04-15 14:23:48 ERROR database-client Stored procedure returned NULL discount for valid customer
+2026-04-15 14:23:48 ERROR checkout-service Checkout failed for customer_id=1005
+2026-04-15 14:23:50 WARN  monitoring Database connection pool utilization: 95% (19/20 connections in use)
+2026-04-15 14:23:50 ERROR monitoring Possible connection leak: 8 connections open > 5 minutes
+2026-04-15 14:23:52 INFO  batch-processor Processing 500 loyalty point updates
+2026-04-15 14:23:52 WARN  database-client No transaction handling in update_customer_loyalty_points
+2026-04-15 14:23:54 ERROR database-client Connection timeout during batch update (connection not committed)
+2026-04-15 14:23:54 ERROR batch-processor Lost 350 loyalty point updates due to missing transaction commit
+2026-04-15 14:23:55 CRITICAL dba-monitor Table scan detected on PaymentAuditLog (2.4M rows scanned)
+2026-04-15 14:23:55 ERROR dba-monitor Missing index: PaymentAuditLog(OrderId) causing full table scan
+2026-04-15 14:23:55 WARN  dba-monitor Query cost: 45,000 units - production impact imminent
+2026-04-15 14:24:00 INFO  admin-api Attempting to create order with status: Confirmed'); DROP TABLE Orders; --
+2026-04-15 14:24:00 CRITICAL database-client SQL INJECTION ATTEMPT via sp_CreateOrder
+2026-04-15 14:24:00 ERROR database-client Dynamic SQL execution with string concatenation detected
+2026-04-15 14:24:01 CRITICAL security-monitor SECURITY BREACH: Attempted table deletion blocked by permissions
+2026-04-15 14:24:01 ERROR security-monitor PagerDuty escalation: INC-20260415-1445 escalated to P0
+2026-04-15 14:24:05 WARN  checkout-service Checkout failure rate: 68% in last 5 minutes
+2026-04-15 14:24:05 ERROR monitoring Revenue impact: $18,000/minute due to checkout failures
+2026-04-15 14:24:10 INFO  dba-monitor Running integrity check on Orders table
+2026-04-15 14:24:12 ERROR dba-monitor Found 15 orders with invalid CustomerId (foreign key violation)
+2026-04-15 14:24:12 ERROR dba-monitor Found 3 DiscountRules with invalid LoyaltyTier values
+2026-04-15 14:24:12 ERROR dba-monitor Schema constraint violations detected - data integrity compromised
+2026-04-15 14:24:15 CRITICAL incident-commander All hands on deck - multiple database vulnerabilities confirmed
+2026-04-15 14:24:15 CRITICAL incident-commander SQL injection, missing indexes, NULL handling, integrity violations
+2026-04-15 14:24:15 ERROR incident-commander Estimated time to fix: 2-4 hours
+2026-04-15 14:24:15 ERROR incident-commander Estimated revenue loss: $2.16M if not fixed within 2 hours

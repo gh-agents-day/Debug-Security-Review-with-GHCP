@@ -1,0 +1,158 @@
+# TaskForce Pro - Production Configuration
+# WARNING: This file contains INTENTIONAL SECURITY VULNERABILITIES
+
+# Application Settings
+app_name: "TaskForce Pro"
+environment: "production"
+version: "2.4.1"
+
+# SEC-006: DATABASE CREDENTIALS HARDCODED IN CONFIG FILE
+# CRITICAL: Never commit database passwords to version control!
+database:
+  host: "taskforce-prod-db.postgres.database.azure.com"
+  port: 5432
+  name: "taskforce_production"
+  user: "dbadmin"
+  password: "Pr0d#DB!P@ssw0rd2026"  # EXPOSED!
+  pool_size: 20
+  max_overflow: 10
+
+# Database URL construction (with hardcoded password)
+database_url: "postgresql://dbadmin:Pr0d#DB!P@ssw0rd2026@taskforce-prod-db.postgres.database.azure.com:5432/taskforce_production"
+
+# SEC-006: REDIS CREDENTIALS EXPOSED
+redis:
+  host: "taskforce-prod-redis.redis.cache.windows.net"
+  port: 6380
+  password: "Red1s#Pr0dP@ss2026"  # EXPOSED!
+  db: 0
+  ssl: true
+
+redis_url: "rediss://:Red1s#Pr0dP@ss2026@taskforce-prod-redis.redis.cache.windows.net:6380/0"
+
+# SEC-008: DEBUG MODE ENABLED IN PRODUCTION
+debug: true  # Should be false!
+log_level: "DEBUG"  # Should be "WARNING" or "ERROR" in production
+
+# SEC-017: NO TLS/SSL ENFORCEMENT
+security:
+  require_https: false  # Should be true!
+  hsts_enabled: false   # HTTP Strict Transport Security disabled
+  secure_cookies: false # Cookies sent over HTTP
+
+# SEC-003: JWT SECRET HARDCODED
+# This is a CRITICAL vulnerability - anyone with this secret can forge tokens
+jwt:
+  secret_key: "super-secret-jwt-key-do-not-share-2026"  # EXPOSED!
+  algorithm: "HS256"
+  access_token_expire_minutes: 43200  # 30 days (too long!)
+  refresh_token_expire_minutes: 525600  # 1 year (way too long!)
+
+# SEC-001: AWS CREDENTIALS HARDCODED
+# CRITICAL: Complete AWS account compromise possible
+aws:
+  access_key_id: "AKIAIOSFODNN7EXAMPLE"  # EXPOSED! (This is an example AWS key format)
+  secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"  # EXPOSED!
+  region: "us-east-1"
+  s3_bucket: "taskforce-pro-attachments"
+
+# SEC-006: THIRD-PARTY API KEYS EXPOSED
+integrations:
+  slack:
+    webhook_url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX"
+    bot_token: "xoxb-1234567890-1234567890-XXXXXXXXXXXXXXXXXXXX"
+  
+  sendgrid:
+    api_key: "SG.1234567890abcdefghijklmnopqrstuvwxyz.1234567890abcdefghijklmnopqrstuvwxyz"
+    from_email: "noreply@taskforcepro.com"
+  
+  microsoft_teams:
+    webhook_url: "https://outlook.office.com/webhook/abcd-1234-efgh-5678/IncomingWebhook/xyz123"
+  
+  jira:
+    api_url: "https://globaltech.atlassian.net"
+    username: "integration@globaltech.com"
+    api_token: "ATATT3xFfGF0123456789abcdefghijklmnopqrstuvwxyz"
+
+# SEC-012: NO RATE LIMITING CONFIGURATION
+rate_limiting:
+  enabled: false  # Should be true!
+  requests_per_minute: 1000  # Way too high
+  login_attempts: 100  # Should be 5-10
+
+# SEC-013: WEAK PASSWORD POLICY
+password_policy:
+  min_length: 6  # Should be at least 12
+  require_uppercase: false  # Should be true
+  require_lowercase: false  # Should be true
+  require_numbers: false  # Should be true
+  require_special: false  # Should be true
+  max_age_days: 365  # Should be 90
+  prevent_reuse: false  # Should track last 10 passwords
+
+# SEC-020: INSUFFICIENT LOGGING & MONITORING
+logging:
+  level: "DEBUG"
+  log_sensitive_data: true  # Should be false!
+  log_sql_queries: true  # Logs may contain sensitive data
+  log_request_bodies: true  # May contain passwords, tokens
+  
+monitoring:
+  enabled: false  # Should be true!
+  application_insights_key: ""  # Not configured
+  sentry_dsn: ""  # Not configured
+
+# CORS Configuration
+cors:
+  allow_origins:
+    - "*"  # SEC-014: Allows all origins (CSRF risk)
+  allow_credentials: true
+  allow_methods: ["*"]
+  allow_headers: ["*"]
+
+# Session Configuration
+session:
+  secret_key: "session-secret-key-2026"  # EXPOSED!
+  cookie_name: "taskforce_session"
+  cookie_secure: false  # Should be true (HTTPS only)
+  cookie_httponly: false  # Should be true (prevent XSS)
+  cookie_samesite: "none"  # Should be "strict" or "lax"
+  max_age: 2592000  # 30 days (too long)
+
+# File Upload Configuration
+file_upload:
+  max_file_size: 104857600  # 100 MB
+  allowed_extensions:
+    - "*"  # SEC-015: Allows any file type (dangerous!)
+  upload_path: "/var/taskforce/uploads"
+  scan_for_malware: false  # Should be true!
+
+# Email Configuration (for password resets, notifications)
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  username: "taskforce-noreply@globaltech.com"
+  password: "gmailAppP@ssw0rd2026"  # EXPOSED!
+  use_tls: true
+
+# Feature Flags
+features:
+  enable_api_documentation: true  # Should be false in production
+  enable_admin_endpoints: true
+  enable_debug_toolbar: true  # Exposes sensitive info
+  allow_password_reset: true
+  require_email_verification: false  # Should be true
+  require_mfa: false  # Should be true for admin users
+
+# Compliance & Privacy
+compliance:
+  gdpr_enabled: false  # Should be true for EU users
+  data_retention_days: 2555  # 7 years (too long)
+  anonymize_deleted_users: false  # Should be true
+  log_data_access: false  # Should be true (audit trail)
+
+# Internal URLs (should not be exposed)
+internal:
+  admin_portal: "https://admin.taskforcepro.internal"
+  database_console: "https://db-console.taskforcepro.internal"
+  monitoring_dashboard: "https://grafana.taskforcepro.internal"
