@@ -53,7 +53,6 @@ pip install fastapi uvicorn pyjwt pytest httpx pytest-httpx
 ### Step 2 — Start the application
 
 ```bash
-cd enterprise-app/task-management
 python main.py
 ```
 
