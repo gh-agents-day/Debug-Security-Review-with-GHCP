@@ -48,7 +48,7 @@ code database/schema.sql
 
 **📝 Prompt for Copilot Chat:**
 ```
-@workspace Review the database schema in #file:schema.sql and identify all intentional bugs. 
+#codebase Review the database schema in #file:schema.sql and identify all intentional bugs. 
 Create a categorized list of:
 1. Security vulnerabilities (SQL injection, credential exposure)
 2. Data integrity issues (missing constraints, foreign keys)
@@ -149,7 +149,7 @@ For each priority level, list the specific files and line numbers to fix.
 
 **📝 Prompt for Copilot Chat:**
 ```
-@workspace Fix the SQL injection vulnerability in database_client.py method search_orders_by_customer (lines 120-127).
+#codebase Fix the SQL injection vulnerability in database_client.py method search_orders_by_customer (lines 120-127).
 
 Replace string concatenation with parameterized queries.
 Show me the fixed code.
